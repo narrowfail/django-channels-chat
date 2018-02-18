@@ -1,0 +1,14 @@
+{% extends "rest_framework/base.html" %}
+{% load static %}
+
+{% block branding %}
+    <a class='navbar-brand' rel="nofollow" href='/'>
+        CHAT - REST API
+    </a>
+{% endblock %}
+
+{% block title %}
+    {% if name %}{{ name }} – {% endif %}CHAT
+{% endblock %}
+
+{% block bootstrap_navbar_variant %}{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Log In{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+
+        <form class="form-signin" method="post">
+            {% csrf_token %}
+
+            <h2 class="form-signin-heading">Please log in</h2>
+
+            <br>
+
+            {% if form.errors %}
+                <div class="span3 alert alert-danger">
+                    <h4>Error!</h4>
+                    Please enter a correct username and password. Fields
+                    are case-sensitive.
+                </div>
+            {% endif %}
+
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" id="username" class="form-control"
+                   name="username" placeholder="Username"
+                   value="{{ form.username.value|default_if_none:"" }}"
+                   required autofocus>
+
+            <label for="password" class="sr-only">Password</label>
+            <input type="password" id="password" class="form-control"
+                   name="password" placeholder="Password" required>
+
+            <br>
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">
+                Log In
+            </button>
+
+        </form>
+
+    </div> <!-- /container -->
+{% endblock %}
