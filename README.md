@@ -29,7 +29,7 @@ the Redis backend to improve performance and spawn multiple workers in a
 distributed environment.
 
 Please take a look at the link below for more information:
-https://channels.readthedocs.io/en/latest/getting-started.html#running-with-channels
+https://channels.readthedocs.io/en/latest/introduction.html
 
 ### Database ###
 For this demo, I'm using a simple MySQL setup. If more performance is required, 
