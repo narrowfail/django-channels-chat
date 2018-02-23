@@ -7,7 +7,7 @@ from django.db.models import (Model, TextField, DateTimeField, ForeignKey,
 class MessageModel(Model):
     """
     This class represents a chat message. It has a owner (user), timestamp and
-    they message body.
+    the message body.
 
     """
     user = ForeignKey(User, on_delete=CASCADE, verbose_name='user',
@@ -30,7 +30,7 @@ class MessageModel(Model):
 
     def notify_ws_clients(self):
         """
-        Inform client there is a new message
+        Inform client there is a new message.
         """
         notification = {'text': '%s' % self.id}
         Group('%s' % self.recipient.id).send(notification)
@@ -39,7 +39,7 @@ class MessageModel(Model):
     def save(self, *args, **kwargs):
         """
         Trims white spaces, saves the message and notifies the recipient via WS
-        if the message is new
+        if the message is new.
         """
         new = self.id
         self.body = self.body.strip()  # Trimming whitespaces from the body

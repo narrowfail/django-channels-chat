@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 class MessageTestCase(TestCase):
     """
-    Toy model test cases (there isn't much bussine logic)
+    Toy model test cases (there isn't much bussine logic).
     """
 
     def setUp(self):
