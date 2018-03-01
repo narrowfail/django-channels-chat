@@ -41,7 +41,7 @@ class MessageTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             MessageModel.objects.create(user=None, body='test')
 
-    def test_message_create_retrive(self):
+    def test_message_create_retrieve(self):
         mid = MessageModel.objects.create(user=self.test_user1,
                                           recipient=self.test_user2,
                                           body='tbody').id
