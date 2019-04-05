@@ -48,8 +48,6 @@ function getConversation(recipient) {
 }
 
 function getMessageById(message) {
-    typeof(message)
-    id=message["message"]
     id = JSON.parse(message).message
     $.getJSON(`/api/v1/message/${id}/`, function (data) {
         if (data.user === currentRecipient ||
@@ -109,7 +107,6 @@ $(document).ready(function () {
     });
 
     socket.onmessage = function (e) {
-        console.log("socke got message")
         getMessageById(e.data);
     };
 });
