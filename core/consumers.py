@@ -1,18 +1,49 @@
-from channels import Group
-from channels.auth import channel_session_user, channel_session_user_from_http
-from channels.security.websockets import allowed_hosts_only
+
+# chat/consumers.py
+
+from channels.generic.websocket import AsyncWebsocketConsumer
+import json
 
 
-@allowed_hosts_only
-@channel_session_user_from_http
-def ws_add(message):
-    # Accept connection
-    message.reply_channel.send({"accept": True})
-    # Add them to the user group
-    Group('%s' % message.user.id).add(message.reply_channel)
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        user_id = self.scope["session"]["_auth_user_id"]
+        self.group_name = "{}".format(user_id)
+        # Join room group
 
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
 
-@channel_session_user
-def ws_disconnect(message):
-    # Remove user group
-    Group('%s' % message.user.id).discard(message.reply_channel)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    async def receive(self, text_data=None,bytes_data = None):
+
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.chat_group_name,
+            {
+                'type': 'recieve_group_message',
+                'message': message
+            }
+        )
+
+    async def recieve_group_message(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        await self.send(
+             text_data=json.dumps({
+            'message': message
+        }))

@@ -47,7 +47,8 @@ function getConversation(recipient) {
 
 }
 
-function getMessageById(id) {
+function getMessageById(message) {
+    id = JSON.parse(message).message
     $.getJSON(`/api/v1/message/${id}/`, function (data) {
         if (data.user === currentRecipient ||
             (data.recipient === currentRecipient && data.user == currentUser)) {
@@ -88,7 +89,10 @@ $(document).ready(function () {
     updateUserList();
     disableInput();
 
-    let socket = new WebSocket(`ws://127.0.0.1:8000/?session_key=${sessionKey}`);
+//    let socket = new WebSocket(`ws://127.0.0.1:8000/?session_key=${sessionKey}`);
+    var socket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws?session_key=${sessionKey}')
 
     chatInput.keypress(function (e) {
         if (e.keyCode == 13)
