@@ -1,7 +1,9 @@
-from channels import Group
 from django.contrib.auth.models import User
 from django.db.models import (Model, TextField, DateTimeField, ForeignKey,
                               CASCADE)
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 class MessageModel(Model):
@@ -32,9 +34,17 @@ class MessageModel(Model):
         """
         Inform client there is a new message.
         """
-        notification = {'text': '%s' % self.id}
-        Group('%s' % self.recipient.id).send(notification)
-        Group('%s' % self.user.id).send(notification)
+        notification = {
+            'type': 'recieve_group_message',
+            'message': '{}'.format(self.id)
+        }
+
+        channel_layer = get_channel_layer()
+        print("user.id {}".format(self.user.id))
+        print("user.id {}".format(self.recipient.id))
+
+        async_to_sync(channel_layer.group_send)("{}".format(self.user.id), notification)
+        async_to_sync(channel_layer.group_send)("{}".format(self.recipient.id), notification)
 
     def save(self, *args, **kwargs):
         """
