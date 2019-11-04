@@ -1,5 +1,7 @@
 # ChatApp  #
 
+![](http://g.recordit.co/JYruQDLd0h.gif)
+
 A small functional person-to-person message center application built using Django.
 It has a REST API and uses WebSockets to notify clients of new messages and 
 avoid polling.
@@ -31,6 +33,13 @@ distributed environment.
 Please take a look at the link below for more information:
 https://channels.readthedocs.io/en/latest/introduction.html
 
+
+**update 04/06/19**
+
+- using pipenv for package management
+- move to Channels 2
+- use redis as the channel layer backing store. for more information, please check [channels_resid](https://github.com/django/channels_redis)
+
 ### Database ###
 For this demo, I'm using a simple MySQL setup. If more performance is required, 
 a MySQL cluster / shard could be deployed.
@@ -51,14 +60,16 @@ Because of time constraints this project lacks of:
 
 ## Run ##
 
+0. move to project root folder
+
+
 1. Create and activate a virtualenv (Python 3)
 ```bash
-virtualenv -p python3 venv
-source venv/bin/activate
+pipenv --python 3 shell
 ```
 2. Install requirements
 ```bash
-pip install -r requirements.txt
+pipenv install
 ```
 3. Create a MySQL database
 ```sql
