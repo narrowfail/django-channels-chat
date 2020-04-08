@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chat',
         'USER': 'root',
-        'PASSWORD': 'Psql@123$D',
+        'PASSWORD': 'root',
         'OPTIONS': {
         }
     }
