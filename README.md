@@ -75,21 +75,26 @@ pipenv install
 ```sql
 CREATE DATABASE chat CHARACTER SET utf8;
 ```
-4. Init database
+4. Start Redis Server
+```bash
+redis-server
+```
+
+5. Init database
 ```bash
 ./manage.py migrate
 ```
-5. Run tests
+6. Run tests
 ```bash
 ./manage.py test
 ```
 
-6. Create admin user
+7. Create admin user
 ```bash
 ./manage.py createsuperuser
 ```
 
-7. Run development server
+8. Run development server
 ```bash
 ./manage.py runserver
 ```
