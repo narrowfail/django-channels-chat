@@ -38,7 +38,7 @@ https://channels.readthedocs.io/en/latest/introduction.html
 
 - using pipenv for package management
 - move to Channels 2
-- use redis as the channel layer backing store. for more information, please check [channels_resid](https://github.com/django/channels_redis)
+- use redis as the channel layer backing store. for more information, please check [channels_redis](https://github.com/django/channels_redis)
 
 ### Database ###
 For this demo, I'm using a simple MySQL setup. If more performance is required, 
