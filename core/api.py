@@ -1,3 +1,4 @@
+from rest_framework.parsers import FormParser, MultiPartParser
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -5,11 +6,11 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import SessionAuthentication
-
 from chat import settings
 from core.serializers import MessageModelSerializer, UserModelSerializer
 from core.models import MessageModel
-
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     """
@@ -29,12 +30,26 @@ class MessagePagination(PageNumberPagination):
     page_size = settings.MESSAGES_TO_LOAD
 
 
+@csrf_exempt
+def readview(request):
+    if request.method== 'POST':
+        recipient=request.user
+        username=request.POST['user']
+        user= User.objects.filter(username=username).first()
+        msg = MessageModel.objects.filter(user=user, recipient=recipient, is_read= False)
+        for m in msg:
+            m.is_read= True
+            m.save()
+        
+        return JsonResponse({},)
+
 class MessageModelViewSet(ModelViewSet):
     queryset = MessageModel.objects.all()
     serializer_class = MessageModelSerializer
     allowed_methods = ('GET', 'POST', 'HEAD', 'OPTIONS')
+    parser_classes = (MultiPartParser, FormParser,)
     authentication_classes = (CsrfExemptSessionAuthentication,)
-    pagination_class = MessagePagination
+    #pagination_class = MessagePagination
 
     def list(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(Q(recipient=request.user) |
@@ -51,6 +66,7 @@ class MessageModelViewSet(ModelViewSet):
             self.queryset.filter(Q(recipient=request.user) |
                                  Q(user=request.user),
                                  Q(pk=kwargs['pk'])))
+
         serializer = self.get_serializer(msg)
         return Response(serializer.data)
 

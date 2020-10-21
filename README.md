@@ -1,7 +1,5 @@
 # ChatApp  #
 
-![](http://g.recordit.co/JYruQDLd0h.gif)
-
 A small functional person-to-person message center application built using Django.
 It has a REST API and uses WebSockets to notify clients of new messages and 
 avoid polling.
@@ -16,8 +14,6 @@ avoid polling.
    connection (sends the new message ID).
  - When the frontend receives a new message notification (with the message ID),
    it performs a GET query to the API to download the received message.
-
-## Scaling ##
 
 ### Requests ###
 "Because Channels takes Django into a multi-process model, you no longer run 
@@ -34,15 +30,11 @@ Please take a look at the link below for more information:
 https://channels.readthedocs.io/en/latest/introduction.html
 
 
-**update 04/06/19**
-
 - using pipenv for package management
 - move to Channels 2
-- use redis as the channel layer backing store. for more information, please check [channels_redis](https://github.com/django/channels_redis)
 
 ### Database ###
-For this demo, I'm using a simple MySQL setup. If more performance is required, 
-a MySQL cluster / shard could be deployed.
+For this demo, I'm using a simple SQLlite setup. If more performance is required.
 
 PD: I'm using indexes to improve performance.
 
@@ -71,37 +63,20 @@ pipenv --python 3 shell
 ```bash
 pipenv install
 ```
-3. Create a MySQL database
-```sql
-CREATE DATABASE chat CHARACTER SET utf8;
-```
-4. Start Redis Server
-```bash
-redis-server
-```
 
-5. Init database
+3. Init database
 ```bash
 ./manage.py migrate
 ```
-6. Run tests
-```bash
-./manage.py test
-```
 
-7. Create admin user
+4. Create admin user
 ```bash
 ./manage.py createsuperuser
 ```
 
-8. Run development server
+5. Run development server
 ```bash
 ./manage.py runserver
 ```
 
 To override default settings, create a local_settings.py file in the chat folder.
-
-Message prefetch config (load last n messages):
-```python
-MESSAGES_TO_LOAD = 15
-```

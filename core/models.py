@@ -1,27 +1,28 @@
 from django.contrib.auth.models import User
-from django.db.models import (Model, TextField, DateTimeField, ForeignKey,
-                              CASCADE)
-
+from django.db import models
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 
-class MessageModel(Model):
+class MessageModel(models.Model):
     """
     This class represents a chat message. It has a owner (user), timestamp and
     the message body.
 
     """
-    user = ForeignKey(User, on_delete=CASCADE, verbose_name='user',
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user',
                       related_name='from_user', db_index=True)
-    recipient = ForeignKey(User, on_delete=CASCADE, verbose_name='recipient',
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='recipient',
                            related_name='to_user', db_index=True)
-    timestamp = DateTimeField('timestamp', auto_now_add=True, editable=False,
+    timestamp = models.DateTimeField('timestamp', auto_now_add=True, editable=False,
                               db_index=True)
-    body = TextField('body')
+    body = models.TextField('body', default="", blank=True, null=True)
+    is_read= models.BooleanField(default= False, blank=True, null=True)
+    image= models.ImageField(blank=True, null=True, default=None,upload_to='images/',)
+    file= models.FileField(blank=True, null=True, default=None,upload_to='files/',)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.user)
 
     def characters(self):
         """

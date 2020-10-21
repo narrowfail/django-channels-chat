@@ -24,15 +24,52 @@ function drawMessage(message) {
     let position = 'left';
     const date = new Date(message.timestamp);
     if (message.user === currentUser) position = 'right';
-    const messageItem = `
+    let messageItem="";
+    if(message.body && !(message.image || message.file))
+    {
+        messageItem = `
             <li class="message ${position}">
                 <div class="avatar">${message.user}</div>
                     <div class="text_wrapper">
                         <div class="text">${message.body}<br>
                             <span class="small">${date}</span>
+                            <span class="small">${message.is_read}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>`;    
+    }
+    else if(message.image)
+    {
+        messageItem = `
+            <li class="message ${position}">
+                <div class="avatar">${message.user}</div>
+                    <div class="text_wrapper">
+                        <a target="_blank" href="`+message.image+`">
+                          <img src="`+message.image+`" height="100%" width="100%" />
+                        </a>
+                        <br>
+                        <span class="small">${date}</span>
                     </div>
                 </div>
             </li>`;
+    }
+    else if(message.file)
+    {
+        messageItem = `
+            <li class="message ${position}">
+                <div class="avatar">${message.user}</div>
+                    <div class="text_wrapper">
+                        <a target="_blank" href="`+message.file+`">
+                           <iframe width= "100px" height="100px" src="`+message.file+`">
+                            </iframe>                        
+                        </a>
+                        <br>
+                        <span class="small">${date}</span>
+                    </div>
+                </div>
+            </li>`;   
+    }
     $(messageItem).appendTo('#messages');
 }
 
@@ -42,6 +79,14 @@ function getConversation(recipient) {
         for (let i = data['results'].length - 1; i >= 0; i--) {
             drawMessage(data['results'][i]);
         }
+        $.ajax({
+          type:'POST',
+          url:'read/',
+          data:{
+            user:recipient,
+          },
+          dataType:"json",
+        });
         messageList.animate({scrollTop: messageList.prop('scrollHeight')});
     });
 
@@ -58,14 +103,18 @@ function getMessageById(message) {
     });
 }
 
-function sendMessage(recipient, body) {
+function sendMessage(recipient,body, image, file) {
     $.post('/api/v1/message/', {
         recipient: recipient,
-        body: body
-    }).fail(function () {
-        alert('Error! Check console!');
+        body: body,
+        image: image,
+        file: file,
+
+    }).fail(function (response) { 
+        alert('Error: ' + response.responseText);
     });
 }
+
 
 function setCurrentRecipient(username) {
     currentRecipient = username;
@@ -94,6 +143,35 @@ $(document).ready(function () {
         'ws://' + window.location.host +
         '/ws?session_key=${sessionKey}')
 
+
+    document.getElementById("xxxx").addEventListener("change", readFile);
+    function readFile() 
+    {
+        var fileTypes = ['pdf','doc', 'docx','txt'];
+        let file = this.files[0];
+        var extension = file.name.split('.').pop().toLowerCase();
+        isfile = fileTypes.indexOf(extension) > -1;
+        if(isfile)
+        {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function() 
+            {
+                sendMessage(currentRecipient,"","", reader.result);
+            }
+        }
+        else
+        {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function() 
+            {
+                sendMessage(currentRecipient,"",reader.result,"");
+            }
+        }
+        
+    }
+
     chatInput.keypress(function (e) {
         if (e.keyCode == 13)
             chatButton.click();
@@ -101,7 +179,7 @@ $(document).ready(function () {
 
     chatButton.click(function () {
         if (chatInput.val().length > 0) {
-            sendMessage(currentRecipient, chatInput.val());
+            sendMessage(currentRecipient, chatInput.val(),"","");
             chatInput.val('');
         }
     });
