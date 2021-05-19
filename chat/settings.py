@@ -22,7 +22,7 @@ PROJECT_ROOT = BASE_DIR
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ABC1234' #TODO Changeme
+SECRET_KEY = "ABC1234"  # TODO Changeme
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,62 +30,56 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # Apps
-    'core',
-
+    "core",
     # 3rd party
-    'rest_framework',
-    'channels',
+    "rest_framework",
+    "channels",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'chat.urls'
+ROOT_URLCONF = "chat.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [join(BASE_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'chat.wsgi.application'
+WSGI_APPLICATION = "chat.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chat',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'OPTIONS': {
-        }
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",
     }
 }
 
@@ -115,12 +109,9 @@ AUTH_PASSWORD_VALIDATORS = []
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ],
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
 }
 
 MESSAGES_TO_LOAD = 15
@@ -138,9 +129,9 @@ CHANNEL_LAYERS = {
 #     "hosts": [("localhost", 6379)],
 # },
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -152,24 +143,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 # Collect static files here
-STATIC_ROOT = join(PROJECT_ROOT, 'run', 'static_root')
+STATIC_ROOT = join(PROJECT_ROOT, "run", "static_root")
 
 # Collect media files here
-MEDIA_ROOT = join(PROJECT_ROOT, 'run', 'media_root')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = join(PROJECT_ROOT, "run", "media_root")
+MEDIA_URL = "/media/"
 
 # look for static assets here
 STATICFILES_DIRS = [
-    join(PROJECT_ROOT, 'static'),
+    join(PROJECT_ROOT, "static"),
 ]
 
-STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/static/admin/'
+STATIC_URL = "/static/"
+ADMIN_MEDIA_PREFIX = "/static/admin/"
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 # Import local_settings.py
 try:
@@ -177,12 +168,12 @@ try:
 except ImportError:
     pass
 
-ASGI_APPLICATION = 'chat.routing.application'
+ASGI_APPLICATION = "chat.routing.application"
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
