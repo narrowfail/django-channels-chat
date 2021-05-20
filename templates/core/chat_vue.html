@@ -33,10 +33,8 @@
                                     <v-list-item-content>
                                         <v-btn
                                                 block
-                                                v-bind:disabled="currentRoom === index"
-                                                @click="function (){
-                                                    currentRoom = index;
-                                                }"
+                                                v-bind:disabled="currentRoom === room.username"
+                                                @click="setCurrentRecipient(room.username)"
                                         >
                                             JOIN [[ room.username ]]
                                         </v-btn>
@@ -53,14 +51,24 @@
                             <v-divider></v-divider>
                             <v-list v-for="(message, index) in messageList" :key="index">
                                 <v-list-item two-line>
-                                    <v-list-item-content v-bind:class="{'text-right': message.sender === currentUser}">
-                                        <v-list-item-title>[[ message.text ]]</v-list-item-title>
-                                        <v-list-item-subtitle>[[ message.sender ]]</v-list-item-subtitle>
+                                    <v-list-item-content v-bind:class="{'text-right': message.user === currentUser}">
+                                        <v-list-item-title>[[ message.body ]]</v-list-item-title>
+                                        <v-list-item-subtitle>[[ message.user ]]</v-list-item-subtitle>
                                     </v-list-item-content>
                                 </v-list-item>
                             </v-list>
                             <div class="mx-4">
-                                <v-text-field></v-text-field>
+                                <v-card-actions>
+                                    <v-col cols="">
+                                        <v-text-field v-model="messageInput"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="2">
+                                        <v-btn block color="primary"
+                                               @click="sendMessage(currentRoom, messageInput)"
+                                        >Send
+                                        </v-btn>
+                                    </v-col>
+                                </v-card-actions>
                             </div>
                         </v-card>
                     </v-col>
@@ -76,17 +84,17 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <!--<script src="{% static 'js/`app.js' %}"></script>-->
 <script>
-    let sessionKey = "{{ request.session.session_key }}";
-    let currentUser = "{{ request.user.username }}";
-
     new Vue({
         delimiters: ["[[", "]]"],
         el: "#app",
         vuetify: new Vuetify(),
         data() {
             return {
-                currentRoom: 0,
-                currentUser: 'Joe',
+                // Django template
+                sessionKey: "{{ request.session.session_key }}",
+                currentUser: "{{ request.user.username }}",
+
+                currentRoom: null,
                 roomList: [
                     {
                         'name': 'Lobby0',
@@ -95,26 +103,12 @@
                         'name': 'Lobby1',
                     }
                 ],
-                messageList: [
-                    {
-                        'text': 'Hello there! ',
-                        'sender': 'Joe',
-                    },
-                    {
-                        'text': 'Just shut up already',
-                        'sender': 'Johnny',
-                    },
-                ]
+                messageInput: '',
+                messageList: [],
             }
         },
         methods: {
             updateUserList() {
-                // axios.get('https://reqres.in/api/users')
-                //     .then(response => {
-                //         const users = response.data.data;
-                //         console.log(`GET users`, users);
-                //     })
-                //     .catch(error => console.error(error));
                 let that = this;
                 axios
                     .get('api/v1/user')
@@ -125,12 +119,50 @@
                         }
                     )
             },
+            setCurrentRecipient(recipient) {
+                this.currentRoom = recipient;
+                this.getConversation(recipient);
+            },
+            getConversation(recipient) {
+                let that = this;
+                axios
+                    .get('/api/v1/message/?target=' + String(recipient))
+                    .then(function (response) {
+                        console.log(response);
+                        that.messageList = response.data.results;
+                    })
+            },
+            getMessageById(message) {
+                let that = this;
+                let id = JSON.parse(message).message;
+                axios
+                    .get(`/api/v1/message/${id}/`)
+                    .then(function (response) {
+                        console.log(response);
+                        that.messageList = response.data.results;
+                    })
+            },
+            sendMessage(recipient, body) {
+                let that = this;
+                let newMessageData = {
+                    recipient: recipient,
+                    body: body,
+                }
+                axios
+                    .post('/api/v1/message/', newMessageData)
+                    .then(function (response) {
+                        console.log(response)
+                        that.messageInput = '';
+                    })
+            },
             initWebSocket() {
+                let that = this;
                 const socket = new WebSocket(
                     'ws://' + window.location.host +
                     '/ws?session_key=${sessionKey}');
                 socket.onmessage = function (e) {
-                    getMessageById(e.data);
+                    // getMessageById(e.data);
+                    that.getConversation(that.currentRoom);
                 };
             }
         },
