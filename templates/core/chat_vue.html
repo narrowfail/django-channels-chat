@@ -38,7 +38,7 @@
                                                     currentRoom = index;
                                                 }"
                                         >
-                                            JOIN [[ room.name ]]
+                                            JOIN [[ room.username ]]
                                         </v-btn>
                                     </v-list-item-content>
                                 </v-list-item>
@@ -73,7 +73,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-<script src="{% static 'js/`app.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!--<script src="{% static 'js/`app.js' %}"></script>-->
 <script>
     let sessionKey = "{{ request.session.session_key }}";
     let currentUser = "{{ request.user.username }}";
@@ -106,7 +107,39 @@
                 ]
             }
         },
-    });
+        methods: {
+            updateUserList() {
+                // axios.get('https://reqres.in/api/users')
+                //     .then(response => {
+                //         const users = response.data.data;
+                //         console.log(`GET users`, users);
+                //     })
+                //     .catch(error => console.error(error));
+                let that = this;
+                axios
+                    .get('api/v1/user')
+                    .then(
+                        function (response) {
+                            console.log(response.data);
+                            that.roomList = response.data;
+                        }
+                    )
+            },
+            initWebSocket() {
+                const socket = new WebSocket(
+                    'ws://' + window.location.host +
+                    '/ws?session_key=${sessionKey}');
+                socket.onmessage = function (e) {
+                    getMessageById(e.data);
+                };
+            }
+        },
+        mounted() {
+            this.updateUserList();
+            this.initWebSocket();
+        },
+    })
+    ;
 </script>
 
 {% endblock main %}
