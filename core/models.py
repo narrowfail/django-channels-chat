@@ -1,8 +1,31 @@
-from django.contrib.auth.models import User
-from django.db.models import Model, TextField, DateTimeField, ForeignKey, CASCADE
+from django.contrib.auth.models import User, Group
+from django.db.models import (
+    Model,
+    TextField,
+    DateTimeField,
+    ForeignKey,
+    CASCADE,
+    OneToOneField,
+    ManyToManyField,
+)
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+
+
+class RoomModel(Group):
+    group = OneToOneField(
+        Group,
+        related_name="room_group",
+        on_delete=CASCADE,
+        parent_link=True,
+        unique=False,
+    )
+
+    members = ManyToManyField(
+        User,
+        related_name="room_member",
+    )
 
 
 class MessageModel(Model):

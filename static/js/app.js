@@ -20,6 +20,12 @@ function updateUserList() {
     });
 }
 
+function updateRoomList(){
+    $.getJSON('api/v1/room/', function (data) {
+        console.log(data)
+    })
+}
+
 function drawMessage(message) {
     let position = 'left';
     const date = new Date(message.timestamp);
@@ -87,6 +93,7 @@ function disableInput() {
 
 $(document).ready(function () {
     updateUserList();
+    updateRoomList();
     disableInput();
 
 //    let socket = new WebSocket(`ws://127.0.0.1:8000/?session_key=${sessionKey}`);

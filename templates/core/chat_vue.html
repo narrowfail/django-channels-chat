@@ -1,0 +1,112 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<link
+        href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+        rel="stylesheet"
+/>
+<link
+        href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+        rel="stylesheet"
+/>
+<link
+        href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+        rel="stylesheet"
+/>
+<meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+/>
+{% endblock %} {% block main %}
+<div id="app">
+    <v-app>
+        <v-main>
+            <v-container fluid>
+                <v-row>
+                    <v-spacer></v-spacer>
+                    <v-col cols="3">
+                        <v-card>
+                            <v-card-title>
+                                <h3>Room List</h3>
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-list v-for="(room, index) in roomList" :key="index">
+                                <v-list-item>
+                                    <v-list-item-content>
+                                        <v-btn
+                                                block
+                                                v-bind:disabled="currentRoom === index"
+                                                @click="function (){
+                                                    currentRoom = index;
+                                                }"
+                                        >
+                                            JOIN [[ room.name ]]
+                                        </v-btn>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="8">
+                        <v-card>
+                            <v-card-title>
+                                <h3>Chat</h3>
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-list v-for="(message, index) in messageList" :key="index">
+                                <v-list-item two-line>
+                                    <v-list-item-content v-bind:class="{'text-right': message.sender === currentUser}">
+                                        <v-list-item-title>[[ message.text ]]</v-list-item-title>
+                                        <v-list-item-subtitle>[[ message.sender ]]</v-list-item-subtitle>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                            <div class="mx-4">
+                                <v-text-field></v-text-field>
+                            </div>
+                        </v-card>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                </v-row>
+            </v-container>
+        </v-main>
+    </v-app>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="{% static 'js/`app.js' %}"></script>
+<script>
+    let sessionKey = "{{ request.session.session_key }}";
+    let currentUser = "{{ request.user.username }}";
+
+    new Vue({
+        delimiters: ["[[", "]]"],
+        el: "#app",
+        vuetify: new Vuetify(),
+        data() {
+            return {
+                currentRoom: 0,
+                currentUser: 'Joe',
+                roomList: [
+                    {
+                        'name': 'Lobby0',
+                    },
+                    {
+                        'name': 'Lobby1',
+                    }
+                ],
+                messageList: [
+                    {
+                        'text': 'Hello there! ',
+                        'sender': 'Joe',
+                    },
+                    {
+                        'text': 'Just shut up already',
+                        'sender': 'Johnny',
+                    },
+                ]
+            }
+        },
+    });
+</script>
+
+{% endblock main %}

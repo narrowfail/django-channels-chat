@@ -1,5 +1,5 @@
 from django.contrib.admin import ModelAdmin, site
-from core.models import MessageModel
+from core.models import MessageModel, RoomModel
 
 
 class MessageModelAdmin(ModelAdmin):
@@ -11,4 +11,12 @@ class MessageModelAdmin(ModelAdmin):
     date_hierarchy = "timestamp"
 
 
+class RoomModelAdmin(ModelAdmin):
+    list_display = (
+        "group",
+        # "members",
+    )
+
+
 site.register(MessageModel, MessageModelAdmin)
+site.register(RoomModel, RoomModelAdmin)

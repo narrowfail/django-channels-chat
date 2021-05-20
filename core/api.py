@@ -7,8 +7,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import SessionAuthentication
 
 from chat import settings
-from core.serializers import MessageModelSerializer, UserModelSerializer
-from core.models import MessageModel
+from core.serializers import (
+    MessageModelSerializer,
+    UserModelSerializer,
+    RoomModelSerializer,
+)
+from core.models import MessageModel, RoomModel
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -69,3 +73,14 @@ class UserModelViewSet(ModelViewSet):
         # Get all users except yourself
         self.queryset = self.queryset.exclude(id=request.user.id)
         return super(UserModelViewSet, self).list(request, *args, **kwargs)
+
+
+class RoomModelViewSet(ModelViewSet):
+    queryset = RoomModel.objects.all()
+    serializer_class = RoomModelSerializer
+    allowed_methods = "GET"
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        self.queryset = RoomModel.objects.filter(members=request.user)
+        return super(RoomModelViewSet, self).list(request, *args, **kwargs)

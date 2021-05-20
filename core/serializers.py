@@ -1,7 +1,11 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from core.models import MessageModel
-from rest_framework.serializers import ModelSerializer, CharField
+from core.models import MessageModel, RoomModel
+from rest_framework.serializers import (
+    ModelSerializer,
+    CharField,
+    PrimaryKeyRelatedField,
+)
 
 
 class MessageModelSerializer(ModelSerializer):
@@ -26,3 +30,9 @@ class UserModelSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ("username",)
+
+
+class RoomModelSerializer(ModelSerializer):
+    class Meta:
+        model = RoomModel
+        fields = "__all__"

@@ -1,6 +1,7 @@
 # chat/consumers.py
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from core.models import RoomModel
 import json
 
 
