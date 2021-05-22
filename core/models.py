@@ -1,9 +1,31 @@
-from django.contrib.auth.models import User
-from django.db.models import (Model, TextField, DateTimeField, ForeignKey,
-                              CASCADE)
+from django.contrib.auth.models import User, Group
+from django.db.models import (
+    Model,
+    TextField,
+    DateTimeField,
+    ForeignKey,
+    CASCADE,
+    OneToOneField,
+    ManyToManyField,
+)
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+
+
+class RoomModel(Group):
+    group = OneToOneField(
+        Group,
+        related_name="room_group",
+        on_delete=CASCADE,
+        parent_link=True,
+        unique=False,
+    )
+
+    members = ManyToManyField(
+        User,
+        related_name="room_member",
+    )
 
 
 class MessageModel(Model):
@@ -12,13 +34,24 @@ class MessageModel(Model):
     the message body.
 
     """
-    user = ForeignKey(User, on_delete=CASCADE, verbose_name='user',
-                      related_name='from_user', db_index=True)
-    recipient = ForeignKey(User, on_delete=CASCADE, verbose_name='recipient',
-                           related_name='to_user', db_index=True)
-    timestamp = DateTimeField('timestamp', auto_now_add=True, editable=False,
-                              db_index=True)
-    body = TextField('body')
+
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name="user",
+        related_name="from_user",
+        db_index=True,
+    )
+    group = ForeignKey(
+        RoomModel,
+        on_delete=CASCADE,
+        related_name="message_group",
+    )
+
+    timestamp = DateTimeField(
+        "timestamp", auto_now_add=True, editable=False, db_index=True
+    )
+    body = TextField("body")
 
     def __str__(self):
         return str(self.id)
@@ -35,16 +68,18 @@ class MessageModel(Model):
         Inform client there is a new message.
         """
         notification = {
-            'type': 'recieve_group_message',
-            'message': '{}'.format(self.id)
+            "type": "recieve_group_message",
+            "message": "{}".format(self.id),
         }
 
         channel_layer = get_channel_layer()
         print("user.id {}".format(self.user.id))
-        print("user.id {}".format(self.recipient.id))
+        # print("user.id {}".format(self.recipient.id))
 
         async_to_sync(channel_layer.group_send)("{}".format(self.user.id), notification)
-        async_to_sync(channel_layer.group_send)("{}".format(self.recipient.id), notification)
+        # async_to_sync(channel_layer.group_send)(
+        #     "{}".format(self.recipient.id), notification
+        # )
 
     def save(self, *args, **kwargs):
         """
@@ -59,7 +94,7 @@ class MessageModel(Model):
 
     # Meta
     class Meta:
-        app_label = 'core'
-        verbose_name = 'message'
-        verbose_name_plural = 'messages'
-        ordering = ('-timestamp',)
+        app_label = "core"
+        verbose_name = "message"
+        verbose_name_plural = "messages"
+        ordering = ("-timestamp",)

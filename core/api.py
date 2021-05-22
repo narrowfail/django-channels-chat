@@ -7,8 +7,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import SessionAuthentication
 
 from chat import settings
-from core.serializers import MessageModelSerializer, UserModelSerializer
-from core.models import MessageModel
+from core.serializers import (
+    MessageModelSerializer,
+    UserModelSerializer,
+    RoomModelSerializer,
+)
+from core.models import MessageModel, RoomModel
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -26,31 +30,27 @@ class MessagePagination(PageNumberPagination):
     """
     Limit message prefetch to one page.
     """
+
     page_size = settings.MESSAGES_TO_LOAD
 
 
 class MessageModelViewSet(ModelViewSet):
     queryset = MessageModel.objects.all()
     serializer_class = MessageModelSerializer
-    allowed_methods = ('GET', 'POST', 'HEAD', 'OPTIONS')
+    allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
     authentication_classes = (CsrfExemptSessionAuthentication,)
     pagination_class = MessagePagination
 
     def list(self, request, *args, **kwargs):
-        self.queryset = self.queryset.filter(Q(recipient=request.user) |
-                                             Q(user=request.user))
-        target = self.request.query_params.get('target', None)
-        if target is not None:
-            self.queryset = self.queryset.filter(
-                Q(recipient=request.user, user__username=target) |
-                Q(recipient__username=target, user=request.user))
+        self.queryset = self.queryset.filter(group=self.request.query_params["target"])
         return super(MessageModelViewSet, self).list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         msg = get_object_or_404(
-            self.queryset.filter(Q(recipient=request.user) |
-                                 Q(user=request.user),
-                                 Q(pk=kwargs['pk'])))
+            self.queryset.filter(
+                Q(recipient=request.user) | Q(user=request.user), Q(pk=kwargs["pk"])
+            )
+        )
         serializer = self.get_serializer(msg)
         return Response(serializer.data)
 
@@ -58,10 +58,21 @@ class MessageModelViewSet(ModelViewSet):
 class UserModelViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserModelSerializer
-    allowed_methods = ('GET', 'HEAD', 'OPTIONS')
+    allowed_methods = ("GET", "HEAD", "OPTIONS")
     pagination_class = None  # Get all user
 
     def list(self, request, *args, **kwargs):
         # Get all users except yourself
         self.queryset = self.queryset.exclude(id=request.user.id)
         return super(UserModelViewSet, self).list(request, *args, **kwargs)
+
+
+class RoomModelViewSet(ModelViewSet):
+    queryset = RoomModel.objects.all()
+    serializer_class = RoomModelSerializer
+    allowed_methods = "GET"
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        self.queryset = RoomModel.objects.filter(members=request.user)
+        return super(RoomModelViewSet, self).list(request, *args, **kwargs)

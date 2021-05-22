@@ -1,0 +1,178 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<link
+        href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+        rel="stylesheet"
+/>
+<link
+        href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+        rel="stylesheet"
+/>
+<link
+        href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+        rel="stylesheet"
+/>
+<meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+/>
+{% endblock %} {% block main %}
+<div id="app">
+    <v-app>
+        <v-main>
+            <v-container fluid>
+                <v-row>
+                    <v-spacer></v-spacer>
+                    <v-col cols="3">
+                        <v-card>
+                            <v-card-title>
+                                <h3>Room List</h3>
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-list v-for="(room, index) in roomList" :key="index">
+                                <v-list-item>
+                                    <v-list-item-content>
+                                        <v-btn
+                                                block
+                                                v-bind:disabled="currentRoom === room.id"
+                                                @click="setCurrentRecipient(room.id)"
+                                        >
+                                            JOIN [[ room.id ]]
+                                        </v-btn>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="8">
+                        <v-card>
+                            <v-card-title>
+                                <h3>Chat</h3>
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-list v-for="(message, index) in messageList" :key="index">
+                                <v-list-item two-line>
+                                    <v-list-item-content v-bind:class="{'text-right': message.user === currentUser}">
+                                        <v-list-item-title>[[ message.body ]]</v-list-item-title>
+                                        <v-list-item-subtitle>[[ message.user ]]</v-list-item-subtitle>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                            <div class="mx-4">
+                                <v-card-actions>
+                                    <v-col cols="">
+                                        <v-text-field v-model="messageInput"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="2">
+                                        <v-btn block color="primary"
+                                               @click="sendMessage(currentRoom, messageInput)"
+                                        >Send
+                                        </v-btn>
+                                    </v-col>
+                                </v-card-actions>
+                            </div>
+                        </v-card>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                </v-row>
+            </v-container>
+        </v-main>
+    </v-app>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!--<script src="{% static 'js/`app.js' %}"></script>-->
+<script>
+    new Vue({
+        delimiters: ["[[", "]]"],
+        el: "#app",
+        vuetify: new Vuetify(),
+        data() {
+            return {
+                // Django template
+                sessionKey: "{{ request.session.session_key }}",
+                currentUser: "{{ request.user.username }}",
+
+                currentRoom: null,
+                roomList: [
+                    {
+                        'id': 0,
+                    },
+                    {
+                        'id': 1,
+                    }
+                ],
+                messageInput: '',
+                messageList: [],
+            }
+        },
+        methods: {
+            updateUserList() {
+                let that = this;
+                axios
+                    .get('api/v1/room')
+                    .then(
+                        function (response) {
+                            console.log(response.data);
+                            that.roomList = response.data;
+                        }
+                    )
+            },
+            setCurrentRecipient(recipient) {
+                this.currentRoom = recipient;
+                this.getConversation(recipient);
+            },
+            getConversation(recipient) {
+                let that = this;
+                axios
+                    .get('/api/v1/message/?target=' + String(recipient))
+                    .then(function (response) {
+                        console.log(response);
+                        that.messageList = response.data.results;
+                    })
+            },
+            getMessageById(message) {
+                let that = this;
+                let id = JSON.parse(message).message;
+                axios
+                    .get(`/api/v1/message/${id}/`)
+                    .then(function (response) {
+                        console.log(response);
+                        that.messageList = response.data.results;
+                    })
+            },
+            sendMessage(recipient, body) {
+                let that = this;
+                let newMessageData = {
+                    recipient: recipient,
+                    group: recipient,
+                    body: body,
+                }
+                axios
+                    .post('/api/v1/message/', newMessageData)
+                    .then(function (response) {
+                        console.log(response)
+                        that.messageInput = '';
+                    })
+            },
+            initWebSocket() {
+                let that = this;
+                const socket = new WebSocket(
+                    'ws://' + window.location.host +
+                    '/ws?session_key=${sessionKey}');
+                socket.onmessage = function (e) {
+                    // getMessageById(e.data);
+                    that.getConversation(that.currentRoom);
+                };
+            }
+        },
+        mounted() {
+            this.updateUserList();
+            this.initWebSocket();
+        },
+    })
+    ;
+</script>
+
+{% endblock main %}
