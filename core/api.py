@@ -84,8 +84,7 @@ class RoomModelViewSet(ModelViewSet):
         user_list = User.objects.all()
 
         new_group = Group.objects.create(name=get_random_string())
-        room = RoomModel(title=get_random_string())
-        room.base_group = new_group
+        room = RoomModel(base_group=new_group, name=get_random_string())
         room.save()  # must be saved first!
 
         for u in user_list:

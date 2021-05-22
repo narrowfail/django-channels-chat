@@ -32,7 +32,7 @@ class RoomModel(Model):
         related_name="room_member",
     )
 
-    title = CharField(default="", max_length=50)
+    name = CharField(default="", max_length=50)
 
 
 class MessageModel(Model):
