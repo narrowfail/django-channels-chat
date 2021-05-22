@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import action
 
 from chat import settings
 from core.serializers import (
@@ -71,7 +72,7 @@ class UserModelViewSet(ModelViewSet):
 class RoomModelViewSet(ModelViewSet):
     queryset = RoomModel.objects.all()
     serializer_class = RoomModelSerializer
-    allowed_methods = "GET"
+    allowed_methods = ("GET", "POST", "DELETE")
     authentication_classes = (CsrfExemptSessionAuthentication,)
     pagination_class = None
 
@@ -92,3 +93,9 @@ class RoomModelViewSet(ModelViewSet):
         room.save()
 
         return Response(status=200)
+
+    # @action(detail=True, methods=["delete"])
+    # def destroy(self, request, *args, **kwargs):
+    #     room = RoomModel.objects.get(id=request.data["id"])
+    #     room.delete()
+    #     return Response(status=200)
