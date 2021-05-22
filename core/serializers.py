@@ -10,25 +10,21 @@ from rest_framework.serializers import (
 
 class MessageModelSerializer(ModelSerializer):
     user = CharField(source="user.username", read_only=True)
-    recipient = CharField(source="recipient.username")
-    group = CharField()
 
     def create(self, validated_data):
         user = self.context["request"].user
-        recipient = get_object_or_404(
-            User, username=validated_data["recipient"]["username"]
+        room = validated_data["group"]  # but why does this return THE room?
+        msg = MessageModel(
+            group=room,
+            user=user,
+            body=validated_data["body"],
         )
-        group = get_object_or_404(
-            RoomModel, id=validated_data["recipient"]
-        )
-        msg = MessageModel(recipient=recipient, group=group, body=validated_data["body"],
-                           user=user, )
         msg.save()
         return msg
 
     class Meta:
         model = MessageModel
-        fields = ("id", "user", "recipient", "group", "timestamp", "body")
+        fields = ("id", "user", "group", "timestamp", "body")
 
 
 class UserModelSerializer(ModelSerializer):
