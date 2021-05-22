@@ -13,7 +13,7 @@ class MessageModelAdmin(ModelAdmin):
 
 class RoomModelAdmin(ModelAdmin):
     list_display = (
-        "group",
+        "base_group",
         # "members",
     )
 
