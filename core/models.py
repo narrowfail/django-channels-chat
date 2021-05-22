@@ -42,13 +42,6 @@ class MessageModel(Model):
         related_name="from_user",
         db_index=True,
     )
-    recipient = ForeignKey(
-        User,
-        on_delete=CASCADE,
-        verbose_name="recipient",
-        related_name="to_user",
-        db_index=True,
-    )
     group = ForeignKey(
         RoomModel,
         on_delete=CASCADE,
@@ -81,12 +74,12 @@ class MessageModel(Model):
 
         channel_layer = get_channel_layer()
         print("user.id {}".format(self.user.id))
-        print("user.id {}".format(self.recipient.id))
+        # print("user.id {}".format(self.recipient.id))
 
         async_to_sync(channel_layer.group_send)("{}".format(self.user.id), notification)
-        async_to_sync(channel_layer.group_send)(
-            "{}".format(self.recipient.id), notification
-        )
+        # async_to_sync(channel_layer.group_send)(
+        #     "{}".format(self.recipient.id), notification
+        # )
 
     def save(self, *args, **kwargs):
         """

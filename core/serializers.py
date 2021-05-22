@@ -11,6 +11,7 @@ from rest_framework.serializers import (
 class MessageModelSerializer(ModelSerializer):
     user = CharField(source="user.username", read_only=True)
     recipient = CharField(source="recipient.username")
+    group = CharField()
 
     def create(self, validated_data):
         user = self.context["request"].user
@@ -18,9 +19,10 @@ class MessageModelSerializer(ModelSerializer):
             User, username=validated_data["recipient"]["username"]
         )
         group = get_object_or_404(
-            RoomModel, id=validated_data["recipient"]["id"]
+            RoomModel, id=validated_data["recipient"]
         )
-        msg = MessageModel(recipient=recipient, group=group, body=validated_data["body"], user=user)
+        msg = MessageModel(recipient=recipient, group=group, body=validated_data["body"],
+                           user=user, )
         msg.save()
         return msg
 

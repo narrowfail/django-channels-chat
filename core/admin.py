@@ -4,10 +4,10 @@ from core.models import MessageModel, RoomModel
 
 class MessageModelAdmin(ModelAdmin):
     readonly_fields = ("timestamp",)
-    search_fields = ("id", "body", "user__username", "recipient__username")
-    list_display = ("id", "user", "recipient", "group",  "timestamp", "characters")
+    search_fields = ("id", "body", "user__username")
+    list_display = ("id", "user", "group", "timestamp", "characters")
     list_display_links = ("id",)
-    list_filter = ("user", "recipient","group")
+    list_filter = ("user", "group")
     date_hierarchy = "timestamp"
 
 

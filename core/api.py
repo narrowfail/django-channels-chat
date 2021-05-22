@@ -42,15 +42,7 @@ class MessageModelViewSet(ModelViewSet):
     pagination_class = MessagePagination
 
     def list(self, request, *args, **kwargs):
-        self.queryset = self.queryset.filter(
-            Q(recipient=request.user) | Q(user=request.user)
-        )
-        target = self.request.query_params.get("target", None)
-        if target is not None:
-            self.queryset = self.queryset.filter(
-                Q(recipient=request.user, user__username=target)
-                | Q(recipient__username=target, user=request.user)
-            )
+        self.queryset = self.queryset.filter(group=self.request.query_params["target"])
         return super(MessageModelViewSet, self).list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
