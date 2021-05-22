@@ -17,13 +17,16 @@ class MessageModelSerializer(ModelSerializer):
         recipient = get_object_or_404(
             User, username=validated_data["recipient"]["username"]
         )
-        msg = MessageModel(recipient=recipient, body=validated_data["body"], user=user)
+        group = get_object_or_404(
+            RoomModel, id=validated_data["recipient"]["id"]
+        )
+        msg = MessageModel(recipient=recipient, group=group, body=validated_data["body"], user=user)
         msg.save()
         return msg
 
     class Meta:
         model = MessageModel
-        fields = ("id", "user", "recipient", "timestamp", "body")
+        fields = ("id", "user", "recipient", "group", "timestamp", "body")
 
 
 class UserModelSerializer(ModelSerializer):

@@ -49,6 +49,12 @@ class MessageModel(Model):
         related_name="to_user",
         db_index=True,
     )
+    group = ForeignKey(
+        RoomModel,
+        on_delete=CASCADE,
+        related_name="message_group",
+    )
+
     timestamp = DateTimeField(
         "timestamp", auto_now_add=True, editable=False, db_index=True
     )

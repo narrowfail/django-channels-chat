@@ -33,10 +33,10 @@
                                     <v-list-item-content>
                                         <v-btn
                                                 block
-                                                v-bind:disabled="currentRoom === room.username"
-                                                @click="setCurrentRecipient(room.username)"
+                                                v-bind:disabled="currentRoom === room.id"
+                                                @click="setCurrentRecipient(room.id)"
                                         >
-                                            JOIN [[ room.username ]]
+                                            JOIN [[ room.id ]]
                                         </v-btn>
                                     </v-list-item-content>
                                 </v-list-item>
@@ -97,10 +97,10 @@
                 currentRoom: null,
                 roomList: [
                     {
-                        'name': 'Lobby0',
+                        'id': 0,
                     },
                     {
-                        'name': 'Lobby1',
+                        'id': 1,
                     }
                 ],
                 messageInput: '',
@@ -111,7 +111,7 @@
             updateUserList() {
                 let that = this;
                 axios
-                    .get('api/v1/user')
+                    .get('api/v1/room')
                     .then(
                         function (response) {
                             console.log(response.data);
