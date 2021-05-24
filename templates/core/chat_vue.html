@@ -34,7 +34,7 @@
                                             <v-btn
                                                     block
                                                     v-bind:disabled="currentRoom === room.id"
-                                                    @click="setCurrentRecipient(room)"
+                                                    @click="setCurrentRoom(room)"
                                             >
                                                 JOIN [[ room.id ]]
                                             </v-btn>
@@ -94,7 +94,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!--<script src="{% static 'js/`app.js' %}"></script>-->
+    {#    <script src="{% static 'js/`app.js' %}"></script>#}
     <script>
         new Vue({
             delimiters: ["[[", "]]"],
@@ -132,10 +132,12 @@
                             }
                         )
                 },
-                setCurrentRecipient(room) {
+                setCurrentRoom(room) {
                     let wsJsonData = {
+                        "type": "connection_message",
                         "room_id": room.id,
                         "room_name": room.name,
+                        "message": "ROOM SELECT"
                     }
 
                     this.currentRoom = room;
@@ -161,18 +163,31 @@
                             that.messageList = response.data.results;
                         })
                 },
-                sendMessage(recipient, body) {
+                sendMessage(room, body) {
                     let that = this;
+
+                    let newWSData = {
+                        type: "chat_message",
+                        room_name: this.currentRoom.name,
+                        message: body
+                    }
                     let newMessageData = {
-                        recipient: recipient,
-                        group: recipient,
+                        {#recipient: room,#}
+                        group: room.id,
                         body: body,
                     }
+
+                    // WebSocket broadcast
+                    console.log(this.socket.readyState)
+                    this.socket.send(JSON.stringify(newWSData))
+
+                    // HTTP POST to create new Message
                     axios
                         .post('/api/v1/message/', newMessageData)
                         .then(function (response) {
                             that.messageInput = '';
                         })
+                    this.getConversation(this.currentRoom.id)
                 },
                 createRoom() {
                     let that = this;
@@ -187,14 +202,23 @@
                         })
                 },
                 initWebSocket() {
+                    let that = this
                     this.socket = new WebSocket(
                         'ws://' + window.location.host +
                         '/ws?session_key=${sessionKey}');
                     this.socket.onmessage = function (e) {
                         // getMessageById(e.data);
-                        this.getConversation(this.currentRoom);
+                        that.getConversation(that.currentRoom.id);
                         console.log(e.data)
                     };
+                    this.socket.onclose = function (e) {
+                        console.log("ERROR")
+                        console.log(e)
+                    }
+                    this.socket.onerror = function (e) {
+                        console.log("ERROR")
+                        console.log(e)
+                    }
                 }
             },
             mounted() {
