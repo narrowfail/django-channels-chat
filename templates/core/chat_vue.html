@@ -34,7 +34,7 @@
                                             <v-btn
                                                     block
                                                     v-bind:disabled="currentRoom === room.id"
-                                                    @click="setCurrentRecipient(room.id)"
+                                                    @click="setCurrentRecipient(room)"
                                             >
                                                 JOIN [[ room.id ]]
                                             </v-btn>
@@ -44,7 +44,9 @@
                                 <v-divider></v-divider>
                                 <div class="mx-2">
                                     <v-card-actions>
-                                        <v-text-field v-model="newRoomName"></v-text-field>
+                                        <v-text-field
+                                                {#                                                v-model="newRoomName"#}
+                                        ></v-text-field>
                                     </v-card-actions>
                                     <v-card-actions>
                                         <v-btn block color="primary" @click="createRoom()">Create</v-btn>
@@ -100,6 +102,7 @@
             vuetify: new Vuetify(),
             data() {
                 return {
+                    socket: 1,
                     // Django template
                     sessionKey: "{{ request.session.session_key }}",
                     currentUser: "{{ request.user.username }}",
@@ -129,9 +132,15 @@
                             }
                         )
                 },
-                setCurrentRecipient(recipient) {
-                    this.currentRoom = recipient;
-                    this.getConversation(recipient);
+                setCurrentRecipient(room) {
+                    let wsJsonData = {
+                        "room_id": room.id,
+                        "room_name": room.name,
+                    }
+
+                    this.currentRoom = room;
+                    this.socket.send(JSON.stringify(wsJsonData));
+                    this.getConversation(room.id);
                 },
                 getConversation(recipient) {
                     let that = this;
@@ -178,19 +187,19 @@
                         })
                 },
                 initWebSocket() {
-                    let that = this;
-                    const socket = new WebSocket(
+                    this.socket = new WebSocket(
                         'ws://' + window.location.host +
                         '/ws?session_key=${sessionKey}');
-                    socket.onmessage = function (e) {
+                    this.socket.onmessage = function (e) {
                         // getMessageById(e.data);
-                        that.getConversation(that.currentRoom);
+                        this.getConversation(this.currentRoom);
+                        console.log(e.data)
                     };
                 }
             },
             mounted() {
-                this.updateUserList();
                 this.initWebSocket();
+                this.updateUserList();
             },
         })
         ;

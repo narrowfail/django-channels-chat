@@ -1,36 +1,41 @@
-# chat/consumers.py
-
-from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
 from core.models import RoomModel
 import json
 
 
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        user_id = self.scope["session"]["_auth_user_id"]
-        self.group_name = "{}".format(user_id)
-        # Join room group
+class ChatConsumer(WebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.username = None
 
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
+    def connect(self):
+        self.username = self.scope["user"].username
 
-        await self.accept()
+        for group in self.fetch_user_groups(self.username):
+            async_to_sync(self.channel_layer.group_add)(group.name, self.channel_name)
 
-    async def disconnect(self, close_code):
-        # Leave room group
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        self.accept()
 
-    # Receive message from WebSocket
-    async def receive(self, text_data=None, bytes_data=None):
-
+    def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.chat_group_name, {"type": "recieve_group_message", "message": message}
+        recipient_group = text_data_json["room_name"]
+
+        async_to_sync(self.channel_layer.group_send)(
+            recipient_group,
+            {
+                "type": "chat_message",
+                "message": "test message. ",
+            },
         )
 
-    async def recieve_group_message(self, event):
+    # Handler for 'chat_message' type of WS messages
+    def chat_message(self, event):
         message = event["message"]
-
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        self.send(text_data=json.dumps({"message": message}))
+
+    @staticmethod
+    def fetch_user_groups(user):
+        user_groups = RoomModel.objects.filter(members__username=user)
+        return user_groups
