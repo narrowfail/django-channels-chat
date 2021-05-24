@@ -22,7 +22,9 @@
                 <v-container fluid>
                     <v-row>
                         <v-spacer></v-spacer>
-                        <v-col cols="2">
+                        <v-col
+                                class="float-none center-align"
+                                cols="10" sm="4" md="4" lg="4">
                             <v-card>
                                 <v-card-title>
                                     <h3>Room List</h3>
@@ -31,13 +33,23 @@
                                 <v-list v-for="(room, index) in roomList" :key="index">
                                     <v-list-item>
                                         <v-list-item-content>
-                                            <v-btn
-                                                    block
-                                                    v-bind:disabled="currentRoom === room"
-                                                    @click="setCurrentRoom(room)"
-                                            >
-                                                JOIN [[ room.id ]]
-                                            </v-btn>
+                                            <v-row align="center" no-gutters>
+                                                <v-col cols="" class="text-center">
+                                                    <v-chip :color="currentRoom === room ? ('primary lighten-2'): ('')"
+                                                            close
+                                                            @click:close="setCurrentRoom(room)"
+                                                            close-icon="mdi-forum"
+                                                    >ROOM [[ room.name ]]
+                                                    </v-chip>
+                                                </v-col>
+                                                <v-spacer></v-spacer>
+                                                <v-col cols="2">
+                                                    <v-icon @click="removeRoom(room.id)"
+                                                            color="red"
+                                                    >mdi-delete
+                                                    </v-icon>
+                                                </v-col>
+                                            </v-row>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-list>
@@ -54,7 +66,9 @@
                                 </div>
                             </v-card>
                         </v-col>
-                        <v-col cols="5">
+                        <v-col
+                                class="float-none  center-align"
+                                cols="10" sm="4" md="4" lg="4">
                             <v-card>
                                 <v-card-title>
                                     <h3>Chat</h3>
@@ -116,6 +130,7 @@
                     currentUser: "{{ request.user.username }}",
 
                     currentRoom: null,
+                    newRoomName: null,
                     roomList: [
                         {
                             'id': 0,
@@ -208,6 +223,17 @@
                             console.log(response);
                             that.updateUserList();
                         })
+                },
+                removeRoom(roomId) {
+                    let that = this;
+                    axios({
+                        method: 'delete',
+                        url: `/api/v1/room/${roomId}/`,
+                    })
+                        .then(function (response) {
+                                that.updateUserList();
+                            }
+                        )
                 },
                 initWebSocket() {
                     let that = this
