@@ -39,7 +39,7 @@
                                                             close
                                                             @click:close="setCurrentRecipient(room.id)"
                                                             close-icon="mdi-forum"
-                                                    >ROOM #[[ room.id ]]
+                                                    >ROOM [[ room.name ]]
                                                     </v-chip>
                                                 </v-col>
                                                 <v-spacer></v-spacer>
@@ -168,6 +168,12 @@
                         })
                 },
                 sendMessage(recipient, body) {
+                    let sensitive_words = ["fuck", "shit", "共产党",];
+                    for(let i = 0; i < sensitive_words.length; i++){
+                        if(body.search(sensitive_words[i])==0){
+                        body = "****";
+                    }
+                    }
                     let that = this;
                     let newMessageData = {
                         recipient: recipient,
