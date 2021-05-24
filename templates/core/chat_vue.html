@@ -22,7 +22,9 @@
                 <v-container fluid>
                     <v-row>
                         <v-spacer></v-spacer>
-                        <v-col cols="3">
+                        <v-col
+                                class="float-none center-align"
+                                cols="10" sm="4" md="4" lg="4">
                             <v-card>
                                 <v-card-title>
                                     <h3>Room List</h3>
@@ -31,26 +33,21 @@
                                 <v-list v-for="(room, index) in roomList" :key="index">
                                     <v-list-item>
                                         <v-list-item-content>
-                                            <v-row align="center">
-{#                                                <v-spacer></v-spacer>#}
-                                                <v-col cols="5" class="text-center">
-                                                    <v-chip>ROOM #[[ room.id ]]</v-chip>
+                                            <v-row align="center" no-gutters>
+                                                <v-col cols="" class="text-center">
+                                                    <v-chip :color="currentRoom === room.id ? ('primary lighten-2'): ('')"
+                                                            close
+                                                            @click:close="setCurrentRecipient(room.id)"
+                                                            close-icon="mdi-forum"
+                                                    >ROOM #[[ room.id ]]
+                                                    </v-chip>
                                                 </v-col>
-{#                                                <v-spacer></v-spacer>#}
-                                                <v-col cols="">
-                                                    <v-btn
-                                                            v-bind:disabled="currentRoom === room.id"
-                                                            @click="setCurrentRecipient(room.id)"
-                                                    >
-                                                        <v-icon v-bind:disabled="currentRoom === room.id"
-                                                                @click="setCurrentRecipient(room.id)">mdi-forum
-                                                        </v-icon>
-                                                    </v-btn>
-                                                </v-col>
-                                                <v-col cols="">
-                                                    <v-btn @click="removeRoom(room.id)">
-                                                        <v-icon>mdi-delete</v-icon>
-                                                    </v-btn>
+                                                <v-spacer></v-spacer>
+                                                <v-col cols="2">
+                                                    <v-icon @click="removeRoom(room.id)"
+                                                            color="red"
+                                                    >mdi-delete
+                                                    </v-icon>
                                                 </v-col>
                                             </v-row>
                                         </v-list-item-content>
@@ -67,7 +64,9 @@
                                 </div>
                             </v-card>
                         </v-col>
-                        <v-col cols="5">
+                        <v-col
+                                class="float-none  center-align"
+                                cols="10" sm="4" md="4" lg="4">
                             <v-card>
                                 <v-card-title>
                                     <h3>Chat</h3>
