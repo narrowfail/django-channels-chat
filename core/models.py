@@ -7,25 +7,32 @@ from django.db.models import (
     CASCADE,
     OneToOneField,
     ManyToManyField,
+    CharField,
 )
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 
-class RoomModel(Group):
-    group = OneToOneField(
+class RoomModel(Model):
+    """
+    Do NOT extend auth.models.Group as a "Room Group" model
+    unless you want to spend another 3 hour meaninglessly
+    debugging like me.
+    """
+    base_group = OneToOneField(
         Group,
         related_name="room_group",
         on_delete=CASCADE,
         parent_link=True,
-        unique=False,
     )
 
     members = ManyToManyField(
         User,
         related_name="room_member",
     )
+
+    name = CharField(default="", max_length=50)
 
 
 class MessageModel(Model):
