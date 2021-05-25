@@ -159,6 +159,7 @@ ADMIN_MEDIA_PREFIX = "/static/admin/"
 
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/"
 
 ALLOWED_HOSTS = ["*"]
 
