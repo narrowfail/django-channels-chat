@@ -30,29 +30,36 @@
                                     <h3>Room List</h3>
                                 </v-card-title>
                                 <v-divider></v-divider>
-                                <v-list v-for="(room, index) in roomList" :key="index">
-                                    <v-list-item>
-                                        <v-list-item-content>
-                                            <v-row align="center" no-gutters>
-                                                <v-col cols="" class="text-center">
-                                                    <v-chip :color="currentRoom === room ? ('primary lighten-2'): ('')"
-                                                            close
-                                                            @click:close="setCurrentRoom(room)"
-                                                            close-icon="mdi-forum"
-                                                    >ROOM [[ room.name ]]
-                                                    </v-chip>
-                                                </v-col>
-                                                <v-spacer></v-spacer>
-                                                <v-col cols="2">
-                                                    <v-icon @click="removeRoom(room.id)"
-                                                            color="red"
-                                                    >mdi-delete
-                                                    </v-icon>
-                                                </v-col>
-                                            </v-row>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
+
+                                <v-slide-y-transition
+                                        class="py-0"
+                                        group
+                                >
+                                    <v-list v-for="(room, index) in roomList" :key="index">
+                                        <v-list-item>
+                                            <v-list-item-content>
+                                                <v-row align="center" no-gutters>
+                                                    <v-col cols="" class="text-center">
+                                                        <v-chip :color="currentRoom === room ? ('primary lighten-2'): ('')"
+                                                                close
+                                                                @click:close="setCurrentRoom(room)"
+                                                                close-icon="mdi-forum"
+                                                        >ROOM [[ room.name ]]
+                                                        </v-chip>
+                                                    </v-col>
+                                                    <v-spacer></v-spacer>
+                                                    <v-col cols="2">
+                                                        <v-icon @click="removeRoom(room.id)"
+                                                                color="red"
+                                                        >mdi-delete
+                                                        </v-icon>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-slide-y-transition>
+
                                 <v-divider></v-divider>
                                 <div class="mx-2">
                                     <v-card-actions>
@@ -131,14 +138,7 @@
 
                     currentRoom: null,
                     newRoomName: null,
-                    roomList: [
-                        {
-                            'id': 0,
-                        },
-                        {
-                            'id': 1,
-                        }
-                    ],
+                    roomList: [],
                     messageInput: '',
                     messageList: [],
                 }
