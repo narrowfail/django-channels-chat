@@ -81,15 +81,20 @@
                                     <h3>Chat</h3>
                                 </v-card-title>
                                 <v-divider></v-divider>
-                                <v-list v-for="(message, index) in messageList" :key="index">
-                                    <v-list-item two-line>
-                                        <v-list-item-content
-                                                v-bind:class="{'text-right': message.user === currentUser}">
-                                            <v-list-item-title>[[ message.body ]]</v-list-item-title>
-                                            <v-list-item-subtitle>[[ message.user ]]</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
+                                <v-slide-x-transition
+                                        class="py-0"
+                                        group
+                                >
+                                    <v-list v-for="(message, index) in messageList" :key="index">
+                                        <v-list-item two-line>
+                                            <v-list-item-content
+                                                    v-bind:class="{'text-right': message.user === currentUser}">
+                                                <v-list-item-title>[[ message.body ]]</v-list-item-title>
+                                                <v-list-item-subtitle>[[ message.user ]]</v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-slide-x-transition>
                                 <div class="mx-4">
                                     <v-row>
                                         <v-col>
