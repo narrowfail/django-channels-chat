@@ -56,13 +56,20 @@
                                 <v-divider></v-divider>
                                 <div class="mx-2">
                                     <v-card-actions>
-                                        <v-text-field
-                                                {#                                                v-model="newRoomName"#}
-                                        ></v-text-field>
-                                    </v-card-actions>
-                                    <v-card-actions>
-                                        <v-btn block color="primary" @click="createRoom()">Create</v-btn>
-                                    </v-card-actions>
+                                                <v-text-field v-model="messageInput">
+                                                    <template v-slot:append>
+                                                        {# Solution from https://jsfiddle.net/alizadeh118/whsfpkub/1/#}
+                                                        <v-btn
+                                                                depressed
+                                                                tile
+                                                                color="primary"
+                                                                class="ma-0"
+                                                                @click="createRoom()">
+                                                            Create
+                                                        </v-btn>
+                                                    </template>
+                                                </v-text-field>
+                                            </v-card-actions>
                                 </div>
                             </v-card>
                         </v-col>
