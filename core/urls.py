@@ -13,4 +13,5 @@ urlpatterns = [
 
     path('', login_required(
         TemplateView.as_view(template_name='core/chat.html')), name='home'),
+
 ]

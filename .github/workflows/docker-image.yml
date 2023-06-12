@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    timeout-minutes: 2
+    runs-on: self-hosted
+    env:
+      MYSQL_USERNAME: ${{ vars.MYSQL_USERNAME }}
+      MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
+      CHAT_SUPERUSER_EMAIL: ${{ vars.CHAT_SUPERUSER_EMAIL }}
+      DJANGO_SUPERUSER_PASSWORD: ${{ vars.DJANGO_SUPERUSER_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: chmod +x init.sh | 
+        docker stop $(docker ps -a -q) |
+        docker-compose up --detach --build db |
+        docker-compose up --detach --build cache |
+        sleep 1m |
+        docker-compose up --detach --build app |
+        sleep 1m |
+        docker-compose up --detach --build nginx

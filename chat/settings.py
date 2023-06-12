@@ -78,12 +78,14 @@ WSGI_APPLICATION = 'chat.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chat',
-        'USER': 'root',
-        'PASSWORD': 'root',
+        'HOST': os.getenv('DATABASE_HOST', default='localhost'),
+        'USER': os.getenv('MYSQL_USERNAME', default='root'),
+        'PASSWORD': os.getenv('MYSQL_ROOT_PASSWORD', default='1234'),
         'OPTIONS': {
         }
     }
@@ -182,7 +184,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(os.getenv('REDIS_HOST', default='127.0.0.1'), 6379)],
         },
     },
 }
