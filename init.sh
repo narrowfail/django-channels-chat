@@ -1,8 +1,8 @@
 #!/bin/bash
 
 python manage.py collectstatic --noinput
-
-python manage.py migrate
+#
+python manage.py migrate --run-syncdb
 
 #python manage.py test
 python manage.py flush

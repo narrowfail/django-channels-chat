@@ -107,7 +107,6 @@ $(document).ready(function () {
 
     socket.onmessage = function (e) {
         let message = JSON.parse(e.data);
-        console.log(e.data)
         if (message) {
             if (message.type === 'recieve_group_message') {
                 getMessageById(message);

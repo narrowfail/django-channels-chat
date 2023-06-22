@@ -1,7 +1,6 @@
 from django.db import IntegrityError
 from django.test import TestCase
-from core.models import MessageModel
-from django.contrib.auth.models import User
+from core.models import MessageModel, CustomUser
 
 
 class MessageTestCase(TestCase):
@@ -10,8 +9,8 @@ class MessageTestCase(TestCase):
     """
 
     def setUp(self):
-        self.test_user1 = User.objects.create(username='bart')
-        self.test_user2 = User.objects.create(username='milhouse')
+        self.test_user1 = CustomUser.objects.create(username='bart')
+        self.test_user2 = CustomUser.objects.create(username='milhouse')
 
     def test_message_user(self):
         msg = MessageModel.objects.create(user=self.test_user2,

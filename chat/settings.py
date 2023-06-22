@@ -188,3 +188,5 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+AUTH_USER_MODEL  = 'core.CustomUser'

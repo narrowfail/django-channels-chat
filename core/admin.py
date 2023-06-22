@@ -1,5 +1,5 @@
 from django.contrib.admin import ModelAdmin, site
-from core.models import MessageModel
+from core.models import MessageModel, CustomUser
 
 
 class MessageModelAdmin(ModelAdmin):
@@ -11,4 +11,4 @@ class MessageModelAdmin(ModelAdmin):
     date_hierarchy = 'timestamp'
 
 
-site.register(MessageModel, MessageModelAdmin)
+site.register(CustomUser)
