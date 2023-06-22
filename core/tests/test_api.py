@@ -1,18 +1,20 @@
-from django.contrib.auth.models import User
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from core.models import CustomUser
+
 
 class MessageApiTestCase(APITestCase):
     def setUp(self):
-        self.test_user1 = User.objects.create(username='u1')
+        self.test_user1 = CustomUser.objects.create(username='u1')
         self.test_user1.set_password('u1')
         self.test_user1.save()
-        self.test_user2 = User.objects.create(username='u2', password='u2')
+        self.test_user2 = CustomUser.objects.create(username='u2', password='u2')
         self.test_user2.set_password('u2')
         self.test_user2.save()
-        self.test_user3 = User.objects.create(username='u3', password='u3')
+        self.test_user3 = CustomUser.objects.create(username='u3', password='u3')
         self.test_user3.set_password('u3')
         self.test_user3.save()
 
