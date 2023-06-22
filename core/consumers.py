@@ -15,7 +15,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
-
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "user_status",
+                'status': "active",
+                'user_id': self.group_name
+            }
+        )
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -25,6 +32,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "user_status",
+                'status': "inactive",
+                'user_id': self.group_name
+            }
+        )
+
     # Receive message from WebSocket
     async def receive(self, text_data=None,bytes_data = None):
 
@@ -32,10 +48,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         # Send message to room group
         await self.channel_layer.group_send(
-            self.chat_group_name,
+            self.group_name,
             {
                 'type': 'recieve_group_message',
-                'message': message
+                'message': 'message'
             }
         )
 
@@ -43,7 +59,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
 
         # Send message to WebSocket
-        await self.send(
-             text_data=json.dumps({
-            'message': message
+        await self.send(text_data=json.dumps({
+            'type': 'recieve_group_message',
+            'message_id': message
         }))
+
+    async def user_status(self, event):
+        status = event['status']
+        await self.send(text_data=json.dumps({
+            'type': 'user_status',
+            'status': status,
+            'user_id': self.group_name
+        }))
+

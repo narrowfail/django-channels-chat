@@ -48,7 +48,7 @@ function getConversation(recipient) {
 }
 
 function getMessageById(message) {
-    id = JSON.parse(message).message
+    id = message.message_id
     $.getJSON(`/api/v1/message/${id}/`, function (data) {
         if (data.user === currentRecipient ||
             (data.recipient === currentRecipient && data.user == currentUser)) {
@@ -93,7 +93,6 @@ $(document).ready(function () {
     var socket = new WebSocket(
         'ws://' + window.location.host +
         '/ws?session_key=${sessionKey}')
-
     chatInput.keypress(function (e) {
         if (e.keyCode == 13)
             chatButton.click();
@@ -107,9 +106,15 @@ $(document).ready(function () {
     });
 
     socket.onmessage = function (e) {
-        getMessageById(e.data);
+        let message = JSON.parse(e.data);
+        console.log(e.data)
+        if (message) {
+            if (message.type === 'recieve_group_message') {
+                getMessageById(message);
+            }
+        }
     };
-});
 
+});
 
 
